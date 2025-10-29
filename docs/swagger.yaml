@@ -1,0 +1,188 @@
+basePath: /
+consumes:
+- application/json
+definitions:
+  main.Recipe:
+    properties:
+      id:
+        description: |-
+          the id for the recipe
+          read only: true
+          example: 60e9d1f37e19a6b83f3e69f8
+        type: string
+      ingredients:
+        description: |-
+          A list of ingredients needed for the recipe
+          required: true
+        items:
+          type: string
+        type: array
+      instructions:
+        description: |-
+          Step-by-step instructions
+          required: true
+        items:
+          type: string
+        type: array
+      name:
+        description: |-
+          The name of the recipe
+          required: true
+          min length: 3
+          example: Spaghetti Carbonara
+        type: string
+      publishedAt:
+        description: The date the recipe was published
+        type: string
+      tags:
+        description: |-
+          A list of tags for categorization (e.g., Italian, Pasta)
+          example: ["Italian", "Dinner"]
+        items:
+          type: string
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: melakesisay@gmail.com
+    name: Melak Sisay
+    url: https://me-port-sigma.vercel.app/
+  description: This is a sample recipes API. You can find out more about the API at
+    https://github.com/mel-ak/recipes-api
+  title: Recipes API
+  version: 1.0.0
+paths:
+  /recipes:
+    get:
+      consumes:
+      - application/json
+      description: Gets a comprehensive list of all recipes currently available.
+      operationId: listRecipes // Added ID tag based on user input
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved list of recipes
+          schema:
+            items:
+              $ref: '#/definitions/main.Recipe'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: List all recipes
+      tags:
+      - recipes
+    post:
+      consumes:
+      - application/json
+      description: Creates a new recipe and stores it in the database.
+      operationId: newRecipe
+      parameters:
+      - description: Recipe object to be created
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/main.Recipe'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Successfully created the recipe
+          schema:
+            $ref: '#/definitions/main.Recipe'
+        "400":
+          description: Invalid input or validation failed
+          schema:
+            type: string
+      summary: Create a new recipe
+      tags:
+      - recipes
+  /recipes/{id}:
+    delete:
+      description: Deletes a recipe based on the provided ID.
+      operationId: deleteRecipe
+      parameters:
+      - description: ID of the recipe to be deleted
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No content, deletion successful
+        "404":
+          description: Recipe ID not found
+          schema:
+            type: string
+      summary: Delete a recipe
+      tags:
+      - recipes
+    put:
+      consumes:
+      - application/json
+      description: Updates the details of a recipe specified by its ID.
+      operationId: updateRecipe
+      parameters:
+      - description: ID of the recipe
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Recipe object that needs to be updated
+        in: body
+        name: recipe
+        required: true
+        schema:
+          $ref: '#/definitions/main.Recipe'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation, returns the updated recipe
+          schema:
+            $ref: '#/definitions/main.Recipe'
+        "400":
+          description: Invalid input or validation failed
+          schema:
+            type: string
+        "404":
+          description: Invalid recipe ID / Recipe not found
+          schema:
+            type: string
+      summary: Update an existing recipe
+      tags:
+      - recipes
+  /recipes/search:
+    get:
+      consumes:
+      - application/json
+      description: Search for recipes based on tags or other criteria.
+      operationId: searchRecipes
+      parameters:
+      - description: Tag to filter recipes by
+        in: query
+        name: tag
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of matching recipes
+          schema:
+            items:
+              $ref: '#/definitions/main.Recipe'
+            type: array
+      summary: Search recipes
+      tags:
+      - recipes
+produces:
+- application/json
+schemes:
+- http
+swagger: "2.0"
